@@ -1,42 +1,57 @@
 package com.example.splashscreen;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import com.example.splashscreen.databinding.ActivityMainBinding;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
+    private Calendar date=Calendar.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        List<String> fruitsList=new ArrayList<>();
-        fruitsList.add("Mango");
-        fruitsList.add("Apple");
-        fruitsList.add("Banana");
-        fruitsList.add("Guava");
-        fruitsList.add("Grapes");
-
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,fruitsList);
-        binding.designSpinner.setAdapter(adapter);
-        binding.designSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        DatePickerDialog.OnDateSetListener dateSetListener=new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "You Clicked "+fruitsList.get(position), Toast.LENGTH_SHORT).show();
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.set(Calendar.YEAR,year);
+                date.set(Calendar.MONTH,month);
+                date.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                //16/12/2022   16-12-2022
+                updateInputField();
+            }
+        };
+
+
+
+        binding.inputDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(MainActivity.this,dateSetListener,date.get(Calendar.YEAR)
+                ,date.get(Calendar.MONTH),date.get(Calendar.DAY_OF_MONTH))
+                        .show();
             }
         });
 
 
+    }
+
+    private void updateInputField() {
+        String format="dd-MM-YYYY";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            SimpleDateFormat dateFormat=new SimpleDateFormat(format);
+            binding.inputDate.setText(dateFormat.format(date.getTime()));
+        }
 
     }
+
 }
